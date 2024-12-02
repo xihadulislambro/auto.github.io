@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Reward System</title>
+<script src='//niphaumeenses.net/vignette.min.js' data-zone='8588418' data-sdk='show_8588418'></script>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #bab1f3, #bab1f3);
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Main Container */
+        .app-container {
+            background: #35217a;
+            border-radius: 20px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 30px 20px;
+            width: 350px;
+        }
+
+        /* Heading */
+        h2 {
+            margin-bottom: 20px;
+            color: #FFD700;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        /* Developer Label */
+        .developer-label {
+            margin-bottom: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #1e174b, #1e174b);
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Progress Circle */
+        .progress-circle {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 20px auto;
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+
+        .progress-bg {
+            stroke: #444;
+        }
+
+        .progress-fill {
+            stroke: #00c853;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .button {
+            display: block;
+            margin: 15px auto;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            background: linear-gradient(145deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        /* Stats */
+        .stats {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .stats p {
+            margin: 5px 0;
+            color: #ddd;
+        }
+
+        /* Toast Notifications */
+        #toast {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 10px;
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h2>MoneTag Auto Ads</h2>
+        <div class="developer-label">BX</div>
+        
+        <div class="stats">
+            <p id="ads-watched">Watched Ads: 0</p>
+            <p id="points-earned">Earned Points: 0</p>
+        </div>
+
+        <div class="progress-circle">
+            <svg>
+                <circle class="progress-bg" cx="80" cy="80" r="70"></circle>
+                <circle class="progress-fill" cx="80" cy="80" r="70"></circle>
+            </svg>
+            <div class="progress-text" id="progress-text">0%</div>
+        </div>
+
+        <button class="button" onclick="watchAd()">Watch Ad</button>
+        <button class="button" onclick="autoAds()">Auto Show Ads</button>
+        <button class="button" onclick="stopAutoAds()">Stop Auto Ads</button> 
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        let adsWatched = 0;
+        let points = 0;
+        const pointsPerAd = 10;
+        let autoAdsInterval;
+
+        function updateProgress(progress) {
+            const circle = document.querySelector('.progress-fill');
+            const offset = 440 - (440 * progress) / 100;
+            circle.style.strokeDashoffset = offset;
+            document.getElementById('progress-text').innerText = `${progress}%`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function watchAd() {
+            if (typeof show_8588418 === 'function') {
+                show_8588418().then(() => {
+                    adsWatched++;
+                    points += pointsPerAd;
+                    const progress = (adsWatched % 10) * 10;
+                    updateProgress(progress);
+                    document.getElementById('ads-watched').innerText = `Ads Watched: ${adsWatched}`;
+                    document.getElementById('points-earned').innerText = `Points Earned: ${points}`;
+                    if (progress === 100) {
+                        showToast('Task Complete! Bonus Points Earned.');
+                    }
+                }).catch(() => showToast('Ad failed to load.'));
+            }
+        }
+
+        function autoAds() {
+            autoAdsInterval = setInterval(watchAd, 2000);
+        }
+
+        function stopAutoAds() {
+            clearInterval(autoAdsInterval);
+            showToast('Auto Ads Stopped');
+        }
+
+        // Prevent right-click
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+            alert("Buy This Code From Developer");
+            window.location.href = "https://t.me/JH_Bangla_Tips";
+        });
+
+        // Prevent F12, and other developer tools shortcuts
+        document.addEventListener("keydown", (e) => {
+            if (
+                e.key === "F12" || 
+                (e.ctrlKey && ["I", "J", "C", "U", "K", "S", "A", "X", "P"].includes(e.key)) || 
+                (e.shiftKey && e.key === "F10")
+                (e.ctrlKey && e.key === "S")
+                
+            ) {
+                e.preventDefault();
+                alert("Buy This Code From Developer");
+                 window.location.href = "https://t.me/JH_Bangla_Tips";
+            }
+               // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+        e.preventDefault();
+        alert("Buy This Code From Developer");
+         window.location.href = "https://t.me/AkApps_creator";
+      }
+        });
+
+    document.addEventListener('keydown', function (e) {
+      // Check if the Ctrl key is pressed
+      if (e.ctrlKey) {
+        e.preventDefault();
+        alert("Buy This Code From Developer");
+        window.location.href = "https://t.me/JH_Bangla_Tips";
+      }
+    });
+    
+    document.addEventListener('keydown', function (e) {
+      // Check if the Shift key is pressed
+      if (e.shiftKey) {
+        e.preventDefault();
+        alert("Buy This Code From Developer");
+        window.location.href = "https://t.me/JH_Bangla_Tips";
+      }
+    });
+     
+
+        // // Detect Developer Tools
+        // (function() {
+        //     const devToolsDetection = () => {
+        //         const threshold = 160;
+        //         const width = window.outerWidth - window.innerWidth > threshold;
+        //         const height = window.outerHeight - window.innerHeight > threshold;
+        //         if (width || height) {
+        //             alert("Buy This Code From Developer");
+        //             window.location.href = "https://t.me/AkApps_creator";
+        //         }
+        //     };
+        //     setInterval(devToolsDetection, 1000);
+        // })();
+
+        // // Handle Errors
+        // window.onerror = function() {
+        //     alert("Buy This Code From Developer");
+        //     window.location.href = "https://t.me/JH_Bangla_Tips";
+        // };
+    </script>
+</body>
+</html>
